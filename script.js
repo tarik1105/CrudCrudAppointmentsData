@@ -68,7 +68,8 @@ function edit(username,emailId,phonenumber){
 function showNewUserOnScreen(user) {
     var Getp = document.getElementById('ul');
     var createCh = `<li>${user.name} - ${user.email} - ${user.phonenumber} - 
-    <button onclick=delete('${user.name}')>Delete</button></li>`;
+    <button onclick=delete('${user.name}')>Delete</button>
+    <button onclick=editUser('${user.name}','${user.email}','${user.phonenumber}')>Edit</button></li>`;
     Getp.innerHTML += createCh;
 }
 
@@ -105,17 +106,6 @@ function saveToLocalStorage(event) {
         })
         .catch((error) => console.log(error));
 
-        axios.delete(`https://crudcrud.com/api/8e3e1594289d4c1ba44567a070086e44/AppointmentsData/${username}`)
-        .then(() => {
-          // Remove the deleted user detail from the website
-          var listItem = document.querySelector(`li[data-userid="${username}"]`);
-          if (listItem) {
-            listItem.remove();
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
 
     //localStorage.setItem(obj.email, JSON.stringify(obj));
     //showNewUserOnScreen(obj);
@@ -123,6 +113,67 @@ function saveToLocalStorage(event) {
     // Reset the form after saving
     event.target.reset();
 }
+
+function deleteUser(userId) {
+    axios.delete(`https://crudcrud.com/api/8e3e1594289d4c1ba44567a070086e44/AppointmentsData/${userId}`)
+      .then(() => {
+        // Remove the deleted user detail from the website
+        var listItem = document.querySelector(`li[data-userid="${userId}"]`);
+        if (listItem) {
+          listItem.remove();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  
+
+function editUser(userId, name, email, phonenumber) {
+    var usernameInput = document.getElementById('username');
+    var emailInput = document.getElementById('email');
+    var phonenumberInput = document.getElementById('phonenumber');
+  
+    // Set the form values to the user details for editing
+    usernameInput.value = name;
+    emailInput.value = email;
+    phonenumberInput.value = phonenumber;
+  
+    // Add an event listener to the form submit button for updating the user details
+    var submitButton = document.querySelector('.btn-outline-primary');
+    submitButton.addEventListener('click', function (event) {
+      event.preventDefault();
+  
+      // Get the updated values from the form
+      var updatedName = usernameInput.value;
+      var updatedEmail = emailInput.value;
+      var updatedPhonenumber = phonenumberInput.value;
+  
+      // Update the user details in the API
+      axios.put(`https://crudcrud.com/api/8e3e1594289d4c1ba44567a070086e44/AppointmentsData/${userId}`, {
+        name: updatedName,
+        email: updatedEmail,
+        phonenumber: updatedPhonenumber
+      })
+        .then(() => {
+          // Update the user details on the website
+          var listItem = document.querySelector(`li[data-userid="${userId}"]`);
+          if (listItem) {
+            listItem.innerHTML = `${updatedName} - ${updatedEmail} - ${updatedPhonenumber} <i class="fas fa-edit" onclick="editUser('${userId}', '${updatedName}', '${updatedEmail}', '${updatedPhonenumber}')"></i>`;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  
+      // Reset the form after updating
+      event.target.reset();
+  
+      // Remove the event listener to prevent multiple submissions
+      submitButton.removeEventListener('click', this);
+    });
+  }
+  
 
 
 
