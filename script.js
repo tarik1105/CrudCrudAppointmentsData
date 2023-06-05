@@ -67,7 +67,8 @@ function edit(username,emailId,phonenumber){
 
 function showNewUserOnScreen(user) {
     var Getp = document.getElementById('ul');
-    var createCh = `<li>${user.name} - ${user.email} - ${user.phonenumber}</li>`;
+    var createCh = `<li>${user.name} - ${user.email} - ${user.phonenumber} - 
+    <button onclick=delete('${user.name}')>Delete</button></li>`;
     Getp.innerHTML += createCh;
 }
 
@@ -104,10 +105,24 @@ function saveToLocalStorage(event) {
         })
         .catch((error) => console.log(error));
 
+        axios.delete(`https://crudcrud.com/api/8e3e1594289d4c1ba44567a070086e44/AppointmentsData/${username}`)
+        .then(() => {
+          // Remove the deleted user detail from the website
+          var listItem = document.querySelector(`li[data-userid="${username}"]`);
+          if (listItem) {
+            listItem.remove();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
     //localStorage.setItem(obj.email, JSON.stringify(obj));
     //showNewUserOnScreen(obj);
 
     // Reset the form after saving
     event.target.reset();
 }
+
+
 
