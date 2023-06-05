@@ -28,25 +28,31 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function DataOnScreen(data){
-    var Getp=document.getElementById('ul');
-    var createCh=`<li id=${data.username}> ${data.emailId} - ${data.phonenumber} - 
-    <button onclick=delet('${data.username}')>Delete</button>
-    <button onclick=edit('${data.username}','${data.emailID}','${data.phonenumber}')>Edit</button></li>`
+function showNewUserOnScreen(user){
+    document.getElementById('email').value = '';
+    document.getElementById('username').value = '';
+    document.getElementById('phonenumber').value = '';
+    if(localStorage.getItem(user.email) !== null){
+        removeUserFromScreen(user.email)
+    }
+    const parentNode = document.getElementById('ul');
+    const childHTML = `<li id=${user.username}> ${user.emailId} - ${user.phonenumber} - 
+    <button onclick=delet('${user.username}')>Delete</button>
+    <button onclick=edit('${user.username}','${user.emailID}','${user.phonenumber}')>Edit</button></li>`
 
-    Getp.innerHTML+=createCh;
+    parentNode.innerHTML+=childHTML;
 }
    
-function delete(username) {
+function del(username) {
     localStorage.removeItem(username);
     removeScr(username);
 }
 
-function removeScr(data) {
-    var parentnode=document.getElementById('ul');
-    var ChildToBedeleted=document.getElementById(data);
+function removeScr(user) {
+    var parentnode1=document.getElementById('ul');
+    var ChildToBedeleted=document.getElementById(user);
     if(ChildToBedeleted){
-        parentnode.removeChild(ChildToBedeleted)
+        parentnode1.removeChild(ChildToBedeleted)
     }
 }
 
@@ -54,10 +60,10 @@ function edit(username,emailId,phonenumber){
     document.getElementById('username').value=username;
     document.getElementById('emailId').value=emailId;
     document.getElementById('phonenumber').value=phonenumber;
-    delet(username);
+    del(username);
 }
-
 */
+
 
 function showNewUserOnScreen(user) {
     var Getp = document.getElementById('ul');
@@ -77,8 +83,9 @@ function saveToLocalStorage(event) {
         email,
         phonenumber
     };
+    
 
-    axios.post("https://crudcrud.com/api/0872483b126b4ae497a00c02fe9253df/AppointmentsData", obj)
+    axios.post("https://crudcrud.com/api/8e3e1594289d4c1ba44567a070086e44/AppointmentsData", obj)
         .then((response) => {
             showNewUserOnScreen(response.data)
             console.log(response)
@@ -87,9 +94,20 @@ function saveToLocalStorage(event) {
             console.log(err);
         })
 
+    axios.get("https://crudcrud.com/api/8e3e1594289d4c1ba44567a070086e44/AppointmentsData")
+        .then((response) => {
+            console.log(response)
+            for(var i=0; i < response.data.length; i++)
+            {
+                showNewUserOnScreen(response.data[i])
+            }
+        })
+        .catch((error) => console.log(error));
+
     //localStorage.setItem(obj.email, JSON.stringify(obj));
     //showNewUserOnScreen(obj);
 
     // Reset the form after saving
     event.target.reset();
 }
+
